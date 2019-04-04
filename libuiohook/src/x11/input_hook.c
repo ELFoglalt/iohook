@@ -102,7 +102,9 @@ static uiohook_event event;
 
 static Display* disp;
 static Window win;
-static bool grab_enabled = false;
+// Prevent event propagation.
+static bool grab_mouse_event = false;
+static bool grab_keyboard_event = false;
 
 // Event dispatch callback.
 static dispatcher_t dispatcher = NULL;
@@ -355,7 +357,7 @@ void hook_event_proc(XPointer closeure, XRecordInterceptData *recorded_data) {
 
 			// Populate key pressed event.
 			event.time = timestamp;
-			event.reserved = 0x00;
+			event.reserved = grab_keyboard_event;
 
 			event.type = EVENT_KEY_PRESSED;
 			event.mask = get_modifiers();
@@ -371,11 +373,11 @@ void hook_event_proc(XPointer closeure, XRecordInterceptData *recorded_data) {
 			dispatch_event(&event);
 
 			// If the pressed event was not consumed...
-			if (event.reserved ^ 0x01) {
+			if (event.reserved ^ 0x01 || grab_keyboard_event) {
 				for (unsigned int i = 0; i < count; i++) {
 					// Populate key typed event.
 					event.time = timestamp;
-					event.reserved = 0x00;
+					event.reserved = grab_keyboard_event;
 
 					event.type = EVENT_KEY_TYPED;
 					event.mask = get_modifiers();
@@ -448,7 +450,7 @@ void hook_event_proc(XPointer closeure, XRecordInterceptData *recorded_data) {
 
 			// Populate key released event.
 			event.time = timestamp;
-			event.reserved = 0x00;
+			event.reserved = grab_keyboard_event;
 
 			event.type = EVENT_KEY_RELEASED;
 			event.mask = get_modifiers();
@@ -1080,7 +1082,7 @@ static void enable_grab_mouse() {
 	unsigned int masks = ButtonPressMask | ButtonReleaseMask;
 	XGrabPointer(disp, win, true, masks, GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
 
-	grab_enabled = true;
+	grab_mouse_event = true;
 	logger(LOG_LEVEL_INFO,	"%s [%u]: Grab mouse click enabled.\n",
 			__FUNCTION__, __LINE__);
 }
@@ -1091,13 +1093,17 @@ static void disable_grab_mouse() {
 	// https://bugs.freedesktop.org/show_bug.cgi?id=42356#c4
 	XSynchronize(disp, True);
 	XUngrabPointer(disp, CurrentTime);
-	grab_enabled = false;
+	grab_mouse_event = false;
 	logger(LOG_LEVEL_INFO,	"%s [%u]: Grab mouse click disabled.\n",
 			__FUNCTION__, __LINE__);
 }
 
+UIOHOOK_API void grab_keyboad(bool enable) {
+	grab_keyboad = enable;
+}
+
 UIOHOOK_API void grab_mouse_click(bool enable) {
-	if(grab_enabled == enable) {
+	if(grab_mouse_event == enable) {
 		return;
 	}
 	if(enable) {

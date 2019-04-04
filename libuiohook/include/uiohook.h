@@ -417,7 +417,7 @@ extern "C" {
 	UIOHOOK_API void hook_set_logger_proc(logger_t logger_proc);
 
 	// Send a virtual event back to the system.
-	UIOHOOK_API void hook_post_event(uiohook_event * const event);
+	UIOHOOK_API void hook_post_event(uiohook_event* const event);
 
 	// Set the event callback function.
 	UIOHOOK_API void hook_set_dispatch_proc(dispatcher_t dispatch_proc);
@@ -428,6 +428,10 @@ extern "C" {
 	// Withdraw the event hook.
 	UIOHOOK_API int hook_stop();
 
+	// Grab mouse events before they reach other apps.
+	UIOHOOK_API void grab_keyboard(bool enable);
+
+	// Grab mouse events before they reach the window.
 	UIOHOOK_API void grab_mouse_click(bool enable);
 
 	// Retrieves an array of screen data for each available monitor.

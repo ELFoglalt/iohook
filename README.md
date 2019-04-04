@@ -1,3 +1,5 @@
+> This is a fork of [iohook](https://github.com/WilixLead/iohook/) that implements the keyboard input propagating behaviour from [wurikiji's](https://github.com/wurikiji) [closed pull request](https://github.com/wilix-team/iohook/pull/102) into a more recent version of iohook.
+
 # iohook
 
 [![Build status](https://ci.appveyor.com/api/projects/status/2ntnlh6k953he5is?svg=true)](https://ci.appveyor.com/project/Djiit/iohook)
@@ -21,6 +23,17 @@ iohook provides prebuilt version for a bunch of OSes and runtime versions.
 npm install iohook --save # or yarn add iohook
 ```
 
+## Added feature
+
+### iohook.enableKeyboardPropagation()
+
+You can enable keyboard event propagation. Keyboard events are propagated by default.
+
+### iohook.disableKeyboardPropagation()
+
+You can disable keyboard event propagtion. Keyboard events are captured and emitted but not propagated to the apps.
+
+
 ## FAQ
 Q. *Does this module require Java ?*
 
@@ -33,4 +46,5 @@ Thanks to _kwhat_ for the [libuiohook](https://github.com/kwhat/libuiohook) proj
 * [matthewshirley](https://github.com/matthewshirley) (Windows prebuild fix)
 * [djiit](https://github.com/djiit) (project & community help)
 * [ezain](https://github.com/eboukamza) (add feature enable/disable mouse click propagation)
+* [wurikiji](https://github.com/wurikiji) (added functionality for prevetning keyboard event propagation)
 * All the other contributors. Feel free to extend this list !

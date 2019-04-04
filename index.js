@@ -25,6 +25,8 @@ class IOHook extends EventEmitter {
   constructor() {
     super();
     this.active = false;
+    this.grabbingClicks = false;
+    this.grabbingKeyboard = false;
     this.shortcuts = [];
     this.eventProperty = 'keycode';
     this.activatedShortcuts = [];
@@ -44,6 +46,13 @@ class IOHook extends EventEmitter {
    */
   start(enableLogger) {
     if (!this.active) {
+      if (this.grabbingKeyboard) {
+        this.disableKeyboardPropagation();
+      }
+      if (this.grabbingClicks) {
+        this.disableClickPropagation();
+      }
+
       this.active = true;
       this.setDebug(enableLogger);
     }
@@ -54,6 +63,13 @@ class IOHook extends EventEmitter {
    */
   stop() {
     if (this.active) {
+      if (this.grabbingKeyboard) {
+        this.enableKeyboardPropagation();
+      }
+      if (this.grabbingClicks) {
+        this.enableClickPropagation();
+      }
+      
       this.active = false;
     }
   }
@@ -162,6 +178,23 @@ class IOHook extends EventEmitter {
   }
 
   /**
+   * Disable keyboard input propagation.
+   * Keyboard events are captured but not propagated to other apps.
+   */
+  disableKeyboardPropagation() {
+    this.grabbingKeyboard = true;
+    NodeHookAddon.grabKeyboard(true);
+  }
+
+  /**
+   * Enable keyboard input propagation (enabled by defailt).
+   */
+  enableKeyboardPropagation() {
+    this.grabbingKeyboard = false;
+    NodeHookAddon.grabKeyboard(false);
+  }
+
+  /**
    * Specify that key event's `rawcode` property should be used instead of
    * `keycode` when listening for key presses.
    *
@@ -179,6 +212,7 @@ class IOHook extends EventEmitter {
    * The click event are captured and the event emitted but not propagated to the window.
    */
   disableClickPropagation() {
+    this.grabbingClicks = true;
     NodeHookAddon.grabMouseClick(true);
   }
 
@@ -187,6 +221,7 @@ class IOHook extends EventEmitter {
    * The click event are emitted and propagated.
    */
   enableClickPropagation() {
+    this.grabbingClicks = false;
     NodeHookAddon.grabMouseClick(false);
   }
 

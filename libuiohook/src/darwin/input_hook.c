@@ -92,6 +92,8 @@ static uiohook_event event;
 // Event dispatch callback.
 static dispatcher_t dispatcher = NULL;
 
+// Prevent event propagation.
+static unsigned short int grab_keyboard_event = 0x00;
 static unsigned short int grab_mouse_click_event = 0x00;
 
 UIOHOOK_API void hook_set_dispatch_proc(dispatcher_t dispatch_proc) {
@@ -354,7 +356,7 @@ static inline void process_key_pressed(uint64_t timestamp, CGEventRef event_ref)
 
 	// Populate key pressed event.
 	event.time = timestamp;
-	event.reserved = 0x00;
+	event.reserved = grab_keyboard_event;
 
 	event.type = EVENT_KEY_PRESSED;
 	event.mask = get_modifiers();
@@ -370,7 +372,7 @@ static inline void process_key_pressed(uint64_t timestamp, CGEventRef event_ref)
 	dispatch_event(&event);
 
 	// If the pressed event was not consumed...
-	if (event.reserved ^ 0x01) {
+	if (event.reserved ^ 0x01 || grab_keyboard_event) {
 		tis_message->event = event_ref;
 		tis_message->length = 0;
 		bool is_runloop_main = CFEqual(event_loop, CFRunLoopGetMain());
@@ -427,7 +429,7 @@ static inline void process_key_pressed(uint64_t timestamp, CGEventRef event_ref)
 		for (unsigned int i = 0; i < tis_message->length; i++) {
 			// Populate key typed event.
 			event.time = timestamp;
-			event.reserved = 0x00;
+			event.reserved = grab_keyboard_event;
 
 			event.type = EVENT_KEY_TYPED;
 			event.mask = get_modifiers();
@@ -451,7 +453,7 @@ static inline void process_key_released(uint64_t timestamp, CGEventRef event_ref
 
 	// Populate key released event.
 	event.time = timestamp;
-	event.reserved = 0x00;
+	event.reserved = grab_keyboard_event;
 
 	event.type = EVENT_KEY_RELEASED;
 	event.mask = get_modifiers();
@@ -1102,6 +1104,10 @@ CGEventRef hook_event_proc(CGEventTapProxy tap_proxy, CGEventType type, CGEventR
 	}
 
 	return result_ref;
+}
+
+UIOHOOK_API void grab_keyboard(bool enabled){
+	grab_keyboard_event = enabled;
 }
 
 UIOHOOK_API void grab_mouse_click(bool enabled) {
