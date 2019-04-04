@@ -59,9 +59,9 @@ function build(runtime, version) {
       '--runtime=' + runtime
     ];
     console.log('Compiling iohook for ' + runtime + ' v' + version + '>>>>');
-    if (version.split('.')[0] > 4) {
-      process.env.msvs_toolset = 14
-      process.env.msvs_version = 2015
+    if (version.split('.')[0] >= 4) {
+      process.env.msvs_toolset = 15
+      process.env.msvs_version = 2017
     } else {
       process.env.msvs_toolset = 12
       process.env.msvs_version = 2013

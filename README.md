@@ -47,4 +47,5 @@ Thanks to _kwhat_ for the [libuiohook](https://github.com/kwhat/libuiohook) proj
 * [djiit](https://github.com/djiit) (project & community help)
 * [ezain](https://github.com/eboukamza) (add feature enable/disable mouse click propagation)
 * [wurikiji](https://github.com/wurikiji) (added functionality for prevetning keyboard event propagation)
+* [anoadragon453](https://github.com/anoadragon453) (electron 4+ support)
 * All the other contributors. Feel free to extend this list !
